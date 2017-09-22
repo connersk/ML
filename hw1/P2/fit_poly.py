@@ -2,21 +2,18 @@ from loadFittingDataP2 import getData
 import numpy as np
 import sys, os
 import matplotlib.pyplot as plt
+sys.path.insert(0,os.path.join(os.path.dirname(__file__),'..'))
+import pdb; pdb.set_trace()
+import gradient_descent
 
 def fit_polynomial(X, Y, M, out_png=None):
     '''Problem 2.1'''
-    # TODO: replace with our implementation
-    #z = np.polyfit(X, Y, M)
+    ndata = len(X)
+    nparams = M+1
+    Y = np.reshape(Y, (ndata,1))
 
-    assert len(np.shape(X)) == 1
-    A = np.empty((len(X),M+1))
-    for i in range(M+1):
-        A[:,i] = X**i
-    A = np.matrix(A)
-    Y = np.matrix(Y).T # Nx1 matrix
-    weights = np.linalg.inv(A.T*A)*A.T*Y
-    weights = np.reshape(np.array(weights),M+1) # back to np array
-
+    phi = gradient_descent.polynomial_design_matrix(X, M)
+    weights = gradient_descent.analytic_least_squares(phi, Y)
     if out_png:
         plt.figure(1)
         plt.clf()
@@ -33,7 +30,7 @@ def fit_polynomial(X, Y, M, out_png=None):
         #        yy += w*xx**ii
         #    return yy
 
-        y_regress = [polynomial(xx, weights) for xx in xp]
+        y_regress = np.dot(gradient_descent.polynomial_design_matrix(xp,M), weights.reshape((nparams,1)))
         #poly = np.poly1d(z)
         #y_regress = map(poly, xp)
         plt.plot(xp, y_regress, color='red')
@@ -48,19 +45,6 @@ def polynomial(x,weights):
     assert len(np.shape(weights)) == 1
     yy = [w*x**ii for ii, w in enumerate(weights)]
     return np.sum(yy)
-
-def compute_SSE(X, Y, M, weights):
-    '''Problem 2.2'''
-    SSE = 0
-    deriv = 0
-    for x,y in zip(X,Y):
-        diff = y-polynomail(x,weights)
-        SSE += diff**2
-        deriv -= 2*x*diff
-    return SSE, deriv
-
-def central_difference(func, step, x):
-    return (func(x+0.5*step) - func(x-0.5*step))/step
 
 def main():
     X, Y = getData(False)
