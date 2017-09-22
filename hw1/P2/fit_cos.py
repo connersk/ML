@@ -53,12 +53,13 @@ def fit_cosines(X, Y, M, out_png=None):
 
 def main():
     X, Y = getData(False)
+    ndata = len(X)
     for M in (1,2,3,8):
         print 'M=%i' % M
         weights = fit_cosines(X,Y,M,'regress_cos_m_%i.png' % M)
         print weights
-        print 'SSE = {}'.format(gradient_descent.least_squares_objective(weights, cosine_design_matrix(X, M), Y))
-        print 'SSE derivative = {}'.format(gradient_descent.least_squares_gradient(weights, cosine_design_matrix(X, M), Y))
+        print 'SSE = {}'.format(gradient_descent.least_squares_objective(weights, cosine_design_matrix(X, M), Y.reshape((ndata,1))))
+        print 'SSE derivative = {}'.format(gradient_descent.least_squares_gradient(weights, cosine_design_matrix(X, M), Y.reshape((ndata,1))))
 
 
 if __name__ == '__main__':
