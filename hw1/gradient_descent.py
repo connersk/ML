@@ -56,7 +56,7 @@ def stochastic_gradient_descent(func, deriv, X, Y, weights0, tau, k, tol, maxloo
         err.append(abs(fx1-fx0))
         if abs(fx1-fx0) < tol:
             break
-     return weights1, t
+    return weights1, t
 
 def polynomial_design_matrix(x, M):
     '''
