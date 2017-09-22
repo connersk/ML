@@ -72,7 +72,7 @@ def polynomial_design_matrix(x, M):
     assert len(np.shape(x)) == 1, "Data must be 1 dimensional"
     ncols = M +1
     ndata = len(x)
-    phi = np.empty((ncols,ndata))
+    phi = np.empty((ndata,ncols))
     for i in range(ncols):
         phi[:,i] = x**i
     return phi
