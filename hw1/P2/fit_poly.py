@@ -3,7 +3,6 @@ import numpy as np
 import sys, os
 import matplotlib.pyplot as plt
 sys.path.insert(0,os.path.join(os.path.dirname(__file__),'..'))
-import pdb; pdb.set_trace()
 import gradient_descent
 
 def fit_polynomial(X, Y, M, out_png=None):
@@ -23,16 +22,7 @@ def fit_polynomial(X, Y, M, out_png=None):
         y_model = np.cos(np.pi*xp) + 1.5*np.cos(2*np.pi*xp)
         plt.plot(xp, y_model, color='yellow')
 
-        #def polynomial(xx):
-        #    yy = 0
-        #    for ii in range(M+1):
-        #        w = weights.item((ii, 0))
-        #        yy += w*xx**ii
-        #    return yy
-
         y_regress = np.dot(gradient_descent.polynomial_design_matrix(xp,M), weights.reshape((nparams,1)))
-        #poly = np.poly1d(z)
-        #y_regress = map(poly, xp)
         plt.plot(xp, y_regress, color='red')
 
         plt.xlabel('x')
@@ -40,16 +30,17 @@ def fit_polynomial(X, Y, M, out_png=None):
         plt.title('Linear Regression (M={})'.format(M))
 
         plt.savefig(out_png)
-
-def polynomial(x,weights):
-    assert len(np.shape(weights)) == 1
-    yy = [w*x**ii for ii, w in enumerate(weights)]
-    return np.sum(yy)
+    return weights
 
 def main():
     X, Y = getData(False)
+    ndata = len(X)
     for M in (0,1,3,10):
+        print 'M=%i' % M
         weights = fit_polynomial(X,Y,M,'regress_m_%i.png' % M)
+        print weights
+        print 'SSE = {}'.format(gradient_descent.least_squares_objective(weights, gradient_descent.polynomial_design_matrix(X, M), Y.reshape((ndata,1))))
+        print 'SSE derivative = {}'.format(gradient_descent.least_squares_gradient(weights, gradient_descent.polynomial_design_matrix(X, M), Y.reshape((ndata,1))))
 
 if __name__ == '__main__':
     main()
