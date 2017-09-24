@@ -4,12 +4,14 @@ def run_gradient_descent(func, deriv, x0, h, tol):
     x = []
     d = []
     f = []
+    iterations = 0
     while 1:
         dx0 = deriv(x0)
         x.append(x0)
         d.append(dx0)
-
-        x1 = x0 - h*dx0
+        x0 = x0.reshape((x0.shape[0],1))
+        dx0 = dx0.reshape((dx0.shape[0],1))
+        x1 = np.subtract(x0, h*dx0)
         fx1 = func(x1)
         fx0 = func(x0)
         f.append(fx0)
@@ -18,7 +20,8 @@ def run_gradient_descent(func, deriv, x0, h, tol):
             f.append(fx1)
             break
         x0 = x1
-    return x, d, f
+        iterations += 1
+    return x, d, f, iterations
 
 def central_difference(func, step,x):
     return (func(x+0.5*step) - func(x-0.5*step))/step
