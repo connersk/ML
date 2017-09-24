@@ -1,0 +1,4 @@
+python fit_poly.py
+montage -geometry +4+3 -tile 4x2 regress_m_0.png regress_m_1.png regress_m_2.png regress_m_3.png regress_m_4.png regress_m_6.png regress_m_8.png regress_m_10.png all_regress_m.png
+python fit_cos.py 
+montage -geometry +4+3 -tile 4x2 regress_cos_m_* all_regress_cos.png
