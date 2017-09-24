@@ -1,0 +1,53 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{enumitem} 
+\usepackage{graphicx}
+\graphicspath{ {ps1docs/} }
+\usepackage{listings}
+\usepackage{color}
+ 
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+ 
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    %numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+ 
+\lstset{style=mystyle}
+ 
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\C}{\mathcal{C}}
+\newcommand{\D}{\mathcal{D}}
+ 
+\begin{document}
+ 
+\title{Numerical methods for linear regression}
+\author{[redacted]}
+\maketitle
+ 
+In this paper we explore methods for regression of simple linear models. In section 1, we begin by discussing a popular method for the numerical optimization of differentiable cost functions: gradient descent. We compare two variants of its implementation: batch gradient descent and stochastic gradient descent. In section 2, we benchmark the performance of gradient descent on the least squares fitting of a simple linear model and compare its performance against its analytic solution. Here model selection comes into play, and we consider both polynomial basis functions and cosine basis functions for the fitted model. Finally, in sections 3 and 4, we explore the effect of L2- and L1-norm regularization, respectively, in model optimization and discuss their implications on the bias-variance tradeoff of the fitted parameters.
+
+\section{Gradient Descent}
+
+\section{Linear Basis Function Regression}
+
+ \end{document}
