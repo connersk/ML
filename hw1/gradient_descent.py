@@ -18,7 +18,7 @@ def run_gradient_descent(func, deriv, x0, h, tol):
             f.append(fx1)
             break
         x0 = x1
-    return x, d, f0
+    return x, d, f
 
 def central_difference(func, step,x):
     return (func(x+0.5*step) - func(x-0.5*step))/step
