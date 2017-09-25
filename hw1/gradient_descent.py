@@ -23,8 +23,14 @@ def run_gradient_descent(func, deriv, x0, h, tol):
         iterations += 1
     return x, d, f, iterations
 
+
 def central_difference(func, step,x):
-    return (func(x+0.5*step) - func(x-0.5*step))/step
+    central_difference = np.zeros(len(x))
+    for i in range(len(x)):
+        x_diff = np.zeros(len(x))
+        x_diff[i] = 0.5*step
+        central_difference[i] = (func(x+x_diff) - func(x-x_diff))/step
+    return central_difference
 
 def least_squares_objective(weights, X, Y):
     return np.sum((np.dot(X,weights) - Y)**2)
