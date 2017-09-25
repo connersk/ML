@@ -88,6 +88,7 @@ def quadratic_gradient(A,b,x):
 	x = x.reshape((x.shape[0],1))
 	return np.subtract(np.dot(A,x),b)
 
+# For plotting effect of starting guess
 def start_guess(objective, gradient, obj_params, points, cols,h,cc,func_type, out_png):
 	#Note: points and cols must be of the same length
 
@@ -113,6 +114,8 @@ def start_guess(objective, gradient, obj_params, points, cols,h,cc,func_type, ou
     plt.legend(labels,shadow=True,fancybox=True)	
     plt.savefig(out_png)
 
+
+# For plotting effect of step size
 def step_size_effect(objective, gradient, obj_params, steps, cols,start_guess,cc,func_type, out_png):
 	#Note: points and cols must be of the same length
 
@@ -139,6 +142,7 @@ def step_size_effect(objective, gradient, obj_params, steps, cols,start_guess,cc
     plt.legend(labels,shadow=True,fancybox=True)	
     plt.savefig(out_png)
 
+# For plotting effect of covergence criteria
 def covergence_criteria_effect(objective, gradient, obj_params, ccs, cols,start_guess,step,func_type, out_png):
 	#Note: points and cols must be of the same length
 
@@ -164,6 +168,7 @@ def covergence_criteria_effect(objective, gradient, obj_params, ccs, cols,start_
     plt.legend(labels,shadow=True,fancybox=True)	
     plt.savefig(out_png)
 
+# For plotting norm of gradient
 def plot_norm_of_gradient(objective, gradient, obj_args,start_guess,step,cc,func_type, out_png):
 
 	x_res, d_res, f_res, iters = gradient_descent.run_gradient_descent(lambda x: objective(obj_args[0],obj_args[1],x),
@@ -179,8 +184,43 @@ def plot_norm_of_gradient(objective, gradient, obj_args,start_guess,step,cc,func
 	plt.savefig(out_png)
 
 
+# For plotting norm of difference between approx and exact gradients over the gradient descent process
+def plot_finite_diff_vs_gradient(objective, gradient, obj_args, finite_steps,cols, start_guess,step,cc,func_type, out_png):
 
+	x_res, d_res, f_res, iters = gradient_descent.run_gradient_descent(lambda x: objective(obj_args[0],obj_args[1],x),
+    	lambda x: gradient(obj_args[0],obj_args[1],x), start_guess, step, cc)
 
+	#the exact gradient
+	gradient_vals = map(lambda x: gradient(obj_args[0],obj_args[1],x), x_res)
+
+	# calcualting approx gradiet for different finite difference step sizes
+	exact_approx_differences = []
+	for finite_step in finite_steps:
+		finite_diffs = []
+		for i in range(len(x_res)):
+			if i == 0:
+				val = x_res[i]
+			else:
+				val = [np.asscalar(x_res[i][0]),np.asscalar(x_res[i][1])]
+			approx_grad = gradient_descent.central_difference(lambda x: objective(obj_args[0],obj_args[1],x),
+		 		finite_step, val).reshape((2,1))
+		 	finite_diffs.append(approx_grad)
+		#calculating norm of difference between approximate and exact gradient calculations
+		exact_approx_differences.append(map(lambda x,y: np.linalg.norm(x-y), gradient_vals,finite_diffs))
+
+	#plotting
+	fig, ax = plt.subplots()
+	labels = map(str, finite_steps)
+	for i in range(0, len(exact_approx_differences)):
+		plt.plot(range(0,iters + 1), exact_approx_differences[i][:-1], cols[i],label=labels[i])
+	ax.set_xlabel('Iterations')
+	ax.set_ylabel('Norm of exact gradient - approximate gradient',color='k')
+	plt.title("Quatratic: Gradient differences")   
+	plt.legend(labels,shadow=True,fancybox=True)	
+	plt.savefig(out_png)
+		
+
+	
 
 def main():
     #X, Y = loadFittingDataP1.getData()
@@ -200,9 +240,9 @@ def main():
     	points=[[(80/3.)-10.,(80/3.)-10.],[(80/3.)-10.,(80/3.)+10.],[(80/3.),(80/3.)-20.],[(80/3.)-20.,(80/3.)-20.],[30.,30.]],
     	cols = ['b^','ko','r-','cv','g>'], h=10**(-2),cc=10**(1),func_type="Quadratic",out_png="quadratic_starting.png")
 
-         #Notes, blue 16,15 converges faster than black 16,26 even tho it starts off worse, which makes sense due to
-    		#co-dependence
-    	#otherwise, close things pretty much
+    #      #Notes, blue 16,15 converges faster than black 16,26 even tho it starts off worse, which makes sense due to
+    # 		#co-dependence
+    # 	#otherwise, close things pretty much
 
     # Gaussian
     start_guess(objective=gaussian_objective, gradient=gaussian_gradient, obj_params=[gaussMean,gaussCov],
@@ -255,6 +295,27 @@ def main():
     plot_norm_of_gradient(objective=gaussian_objective, gradient=gaussian_gradient, 
     	obj_args= [gaussMean,gaussCov],start_guess=np.array([12,12]), step=10**(-2),
     	cc=10**(-2), func_type="Gaussian", out_png="gaussian_gradient_norm.png")
+
+
+   	#####################################################################################
+    # 1.2 Central Difference Calculations
+    #####################################################################################
+
+    plot_finite_diff_vs_gradient(objective=quadratic_objective, gradient=quadratic_gradient, 
+    	obj_args= [quadBowlA,quadBowlb], finite_steps = [0.1,1,10,1000,100000], cols = ['b-','k-','r-','c-','g-'],
+    	start_guess=np.array([(80/3.)-100,(80/3)-100]), step=10**(-2),
+    	cc=10**1, func_type="Quadratic", out_png="quadratic_finite_difference.png")
+    #notes: a sweet spot occurs due to the addition and division terms
+    	#but still really low in all cases, on the scale of 10^-10
+
+    plot_finite_diff_vs_gradient(objective=gaussian_objective, gradient=gaussian_gradient, 
+		obj_args= [gaussMean, gaussCov], finite_steps = [1,2.5,5,10,100], cols = ['b-','k-','r-','c-','g-'],
+		start_guess=np.array([12,12]), step=10**(-2),
+		cc=10**(-2), func_type="Gaussian", out_png="gaussian_finite_difference.png")
+	#notes: scales more so with the values now but way higher error values
+
+
+
 
     
 
