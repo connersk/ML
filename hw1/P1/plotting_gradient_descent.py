@@ -3,11 +3,14 @@ import loadParametersP1
 import numpy as np
 import sys, os
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
 sys.path.insert(0,os.path.join(os.path.dirname(__file__),'..'))
 #import pdb; pdb.set_trace()
 import gradient_descent
 
-def plot_gradient_descent(objective, gradient, obj_args,initial_guess,h,cc, out_png=None):
+def plot_gradient_descent(objective, gradient, obj_args,initial_guess,h,cc, out_png=None, return_vals=False,return_x=False):
     '''Problem 1.1'''
 
     x_res, d_res, f_res, iters = gradient_descent.run_gradient_descent(lambda x: objective(obj_args[0],obj_args[1],x),
@@ -16,17 +19,36 @@ def plot_gradient_descent(objective, gradient, obj_args,initial_guess,h,cc, out_
     f_out = np.concatenate(f_res).ravel().tolist()
     f_diff =  [f_out[i+1]-f_out[i] for i in range(len(f_out)-1)]
 
-    print iters
-    print len(f_diff)
-    print len(f_out)
+    print x_res[-1], f_res[-1]
 
+    if return_vals:
+    	return iters, f_out, f_diff
+
+    if return_x:
+    	return x_res
 
 	
     if out_png:
 
-        # plt.figure(1)
-        # plt.clf()
-        # plt.plot(range(0,iters+1),f_out[:-1],'o',color='blue')
+    	#code for making a 3D plot of the objective function
+
+    	# fig = plt.figure()
+    	# ax = fig.add_subplot(111, projection='3d')
+    	# X = np.arange(-10, 10, 0.25)
+    	# Y = np.arange(-10, 10, 0.25)
+    	# calcXY = np.vstack((X,Y))
+    	# Z = []
+    	# for i in range(0,len(X)):
+    	# 	Z.append(objective(obj_args[0],obj_args[1], np.array([X[i],Y[i]])))
+    	# Z = np.concatenate(Z).ravel().tolist()
+    	# X, Y = np.meshgrid(X, Y)
+
+    	# surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
+     #                   linewidth=0, antialiased=False)
+    	# ax.zaxis.set_major_locator(LinearLocator(10))
+    	# ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
+    	# fig.colorbar(surf, shrink=0.5, aspect=5)
+    	
 
 
         # Code for Plotting Objective function and difference in objective function
@@ -41,28 +63,9 @@ def plot_gradient_descent(objective, gradient, obj_args,initial_guess,h,cc, out_
         ax2.tick_params('y', colors='r')
         fig.tight_layout()
 
+        plt.show()
 
-        # xp = np.linspace(0, 1, 100)
-        # y_model = np.cos(np.pi*xp) + 1.5*np.cos(2*np.pi*xp)
-        # plt.plot(xp, y_model, color='yellow')
-
-        # #def polynomial(xx):
-        # #    yy = 0
-        # #    for ii in range(M+1):
-        # #        w = weights.item((ii, 0))
-        # #        yy += w*xx**ii
-        # #    return yy
-
-        # y_regress = np.dot(gradient_descent.polynomial_design_matrix(xp,M), weights.reshape((nparams,1)))
-        # #poly = np.poly1d(z)
-        # #y_regress = map(poly, xp)
-        # plt.plot(xp, y_regress, color='red')
-
-        # plt.xlabel('x')
-        # plt.ylabel('y')
-        # plt.title('Linear Regression (M={})'.format(M))
-
-        plt.savefig(out_png)
+        #plt.savefig(out_png)
 
 
 #Objective funtions and gradients
@@ -79,11 +82,103 @@ def gaussian_gradient(u, cov, x):
 
 def quadratic_objective(A,b,x):
 	x = x.reshape((x.shape[0],1))
-	return 0.5 * np.subtract(np.dot(x.T, np.dot(A,x)),np.dot(x.T,b))
+	return np.subtract(0.5*np.dot(x.T, np.dot(A,x)),np.dot(x.T,b))
 
 def quadratic_gradient(A,b,x):
 	x = x.reshape((x.shape[0],1))
 	return np.subtract(np.dot(A,x),b)
+
+def start_guess(objective, gradient, obj_params, points, cols,h,cc,func_type, out_png):
+	#Note: points and cols must be of the same length
+
+	# run gradient descent at all of the points
+    iterations = []
+    obj_vals = []
+    obj_diff = []
+    for point in points:
+    	iters, f_out, f_diff = plot_gradient_descent(objective, gradient, obj_params, np.array(point), 
+    		h, cc, return_vals=True)
+    	iterations.append(iters)
+    	obj_vals.append(f_out)
+    	obj_diff.append(f_diff)
+
+    #and then plot
+    fig, ax = plt.subplots()
+    labels = map(lambda x: str([round(i,2) for i in x]), points)
+    for i in range(0, len(iterations)):
+    	plt.plot(range(0,iterations[i] + 1), obj_vals[i][:-1], cols[i],label=labels[i])
+    ax.set_xlabel('Iterations')
+    ax.set_ylabel('Objective function',color='k')
+    plt.title(func_type + " : Effect of starting guess")   
+    plt.legend(labels,shadow=True,fancybox=True)	
+    plt.savefig(out_png)
+
+def step_size_effect(objective, gradient, obj_params, steps, cols,start_guess,cc,func_type, out_png):
+	#Note: points and cols must be of the same length
+
+	# run gradient descent at all of the points
+    iterations = []
+    obj_vals = []
+    obj_diff = []
+    for step in steps:
+    	iters, f_out, f_diff = plot_gradient_descent(objective, gradient, obj_params, np.array(start_guess), 
+    		step, cc, return_vals=True)
+    	iterations.append(iters)
+    	obj_vals.append(f_out)
+    	obj_diff.append(f_diff)
+
+    #and then plot
+    fig, ax = plt.subplots()
+    #labels = map(lambda x: str([round(i,2) for i in x]), points)
+    labels = map(str, steps)
+    for i in range(0, len(iterations)):
+    	plt.plot(range(0,iterations[i] + 1), obj_vals[i][:-1], cols[i],label=labels[i])
+    ax.set_xlabel('Iterations')
+    ax.set_ylabel('Objective function',color='k')
+    plt.title(func_type + " : Effect of step size")   
+    plt.legend(labels,shadow=True,fancybox=True)	
+    plt.savefig(out_png)
+
+def covergence_criteria_effect(objective, gradient, obj_params, ccs, cols,start_guess,step,func_type, out_png):
+	#Note: points and cols must be of the same length
+
+	# run gradient descent at all of the points
+    iterations = []
+    obj_vals = []
+    obj_diff = []
+    for cc in ccs:
+    	iters, f_out, f_diff = plot_gradient_descent(objective, gradient, obj_params, np.array(start_guess), 
+    		step, cc, return_vals=True)
+    	iterations.append(iters)
+    	obj_vals.append(f_out)
+    	obj_diff.append(f_diff)
+
+    #and then plot
+    fig, ax = plt.subplots()
+    labels = map(str, ccs)
+    for i in range(0, len(iterations)):
+    	plt.plot(range(0,iterations[i] + 1), obj_vals[i][:-1], cols[i],label=labels[i])
+    ax.set_xlabel('Iterations')
+    ax.set_ylabel('Objective function',color='k')
+    plt.title(func_type + " : Effect of covergence criteria")   
+    plt.legend(labels,shadow=True,fancybox=True)	
+    plt.savefig(out_png)
+
+def plot_norm_of_gradient(objective, gradient, obj_args,start_guess,step,cc,func_type, out_png):
+
+	x_res, d_res, f_res, iters = gradient_descent.run_gradient_descent(lambda x: objective(obj_args[0],obj_args[1],x),
+    	lambda x: gradient(obj_args[0],obj_args[1],x), start_guess, step, cc)
+	gradient_norm = map(lambda x: np.linalg.norm(gradient(obj_args[0],obj_args[1],x)), x_res)
+	
+	fig, ax = plt.subplots()
+	plt.plot(range(0,iters + 1), gradient_norm[:-1])# cols[i],label=labels[i])
+	ax.set_xlabel('Iterations')
+	ax.set_ylabel('Norm of Gradient',color='k')
+	plt.title(func_type + " : Norm of Gradient")   
+	#plt.legend(labels,shadow=True,fancybox=True)	
+	plt.savefig(out_png)
+
+
 
 
 
@@ -95,14 +190,73 @@ def main():
     gaussMean = gaussMean.reshape((2,1))
     quadBowlb = quadBowlb.reshape((2,1))
 
+    
+    #####################################################################################
+    # Effect of start guess
+    #####################################################################################
 
-    # plot_gradient_descent(gaussian_objective, gaussian_gradient, [gaussMean, gaussCov], 
-    # 	np.array([5,5]), .01, .001, "test_plot.png")
-    plot_gradient_descent(quadratic_objective, quadratic_gradient, [quadBowlA, quadBowlb], 
-    	np.array([-10,-10]), .01, .001, "obj_and_diff.png")
-    # print gaussian_objective(gaussMean, gaussCov,? np.array([5,5]))
-    # print gaussian_gradient(gaussMean, gaussCov, np.array([5,5]))
+    # Quadratic
+    start_guess(objective=quadratic_objective, gradient=quadratic_gradient, obj_params=[quadBowlA,quadBowlb],
+    	points=[[(80/3.)-10.,(80/3.)-10.],[(80/3.)-10.,(80/3.)+10.],[(80/3.),(80/3.)-20.],[(80/3.)-20.,(80/3.)-20.],[30.,30.]],
+    	cols = ['b^','ko','r-','cv','g>'], h=10**(-2),cc=10**(1),func_type="Quadratic",out_png="quadratic_starting.png")
 
+         #Notes, blue 16,15 converges faster than black 16,26 even tho it starts off worse, which makes sense due to
+    		#co-dependence
+    	#otherwise, close things pretty much
+
+    # Gaussian
+    start_guess(objective=gaussian_objective, gradient=gaussian_gradient, obj_params=[gaussMean,gaussCov],
+    	points=[[5.,10.],[5.,15.],[15.,15.],[2.5,10.],[12.5,12.5]],
+    	cols = ['b^','ko','r-','cv','g>'], h=10**(-2),cc=10**(-2),func_type="Gaussian",out_png="gaussian_starting.png")
+
+    #####################################################################################
+    # Effect of step size
+    #####################################################################################
+
+    # Quadratic
+    step_size_effect(objective=quadratic_objective, gradient=quadratic_gradient, obj_params=[quadBowlA,quadBowlb],
+    	steps=[0.001,0.005,0.01,0.05,0.1],
+    	cols = ['b^','ko','r-','cv','g>'], start_guess=[(80/3.)-10,(80/3)-10],
+    	cc=10**(1),func_type="Quadratic",out_png="quadratic_step_size.png")
+
+    # Gaussian
+    step_size_effect(objective=gaussian_objective, gradient=gaussian_gradient, obj_params=[gaussMean,gaussCov],
+		steps=[0.001,0.005,0.01,0.05,0.1],
+		cols = ['b^','ko','r-','cv','g>'], start_guess=[12,12],
+		cc=10**(-2),func_type="Gaussian",out_png="guassian_step_size.png")
+
+	#####################################################################################
+    # Effect of Convergence Criteria
+    #####################################################################################
+
+    #Not so sure that I actually want to go with these plots, if I have time, convert to num iterations
+    	# vs distance from the global minimum and then label the points in the plot
+
+    # Quadratic
+    covergence_criteria_effect(objective=quadratic_objective, gradient=quadratic_gradient, 
+    	obj_params=[quadBowlA,quadBowlb],ccs=[0.001,0.01,0.1,1],
+    	cols = ['b^','ko','r-','cv','g>'], start_guess=[(80/3.)-10,(80/3)-10],
+    	step=10**(-2),func_type="Quadratic",out_png="quadratic_convergence_criteria.png")
+
+    # Gaussian
+    covergence_criteria_effect(objective=gaussian_objective, gradient=gaussian_gradient, 
+    	obj_params=[gaussMean,gaussCov],ccs=[0.001,0.01,0.1,1],
+    	cols = ['b^','ko','r-','cv','g>'], start_guess=[12,12],
+    	step=10**(-2),func_type="Gaussian",out_png="gaussian_convergence_criteria.png")
+
+   	#####################################################################################
+    # Evolution of the norm of the gradient
+    #####################################################################################
+
+    plot_norm_of_gradient(objective=quadratic_objective, gradient=quadratic_gradient, 
+    	obj_args= [quadBowlA,quadBowlb],start_guess=np.array([(80/3.)-10,(80/3)-10]), step=10**(-2),
+    	cc=10**1, func_type="Quadratic", out_png="quadratic_gradient_norm.png")
+
+    plot_norm_of_gradient(objective=gaussian_objective, gradient=gaussian_gradient, 
+    	obj_args= [gaussMean,gaussCov],start_guess=np.array([12,12]), step=10**(-2),
+    	cc=10**(-2), func_type="Gaussian", out_png="gaussian_gradient_norm.png")
+
+    
 
 if __name__ == '__main__':
     main()
