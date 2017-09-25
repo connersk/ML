@@ -14,28 +14,30 @@ def fit_polynomial(X, Y, M, out_png=None):
     phi = gradient_descent.polynomial_design_matrix(X, M)
     weights = gradient_descent.analytic_least_squares(phi, Y)
     if out_png:
-        plt.figure(1)
+        plt.figure(1, figsize=(4,4))
         plt.clf()
-        plt.plot(X,np.array(Y),'o',color='blue')
+        plt.plot(X,np.array(Y),'o',color='blue', label='data')
 
         xp = np.linspace(0, 1, 100)
         y_model = np.cos(np.pi*xp) + 1.5*np.cos(2*np.pi*xp)
-        plt.plot(xp, y_model, color='yellow')
+        plt.plot(xp, y_model, color='orange', label='true model')
 
         y_regress = np.dot(gradient_descent.polynomial_design_matrix(xp,M), weights.reshape((nparams,1)))
-        plt.plot(xp, y_regress, color='red')
+        plt.plot(xp, y_regress, color='red', label='fitted model')
+        SSE = gradient_descent.least_squares_objective(weights, gradient_descent.polynomial_design_matrix(X, M), Y.reshape((ndata,1)))
 
         plt.xlabel('x')
         plt.ylabel('y')
-        plt.title('Linear Regression (M={})'.format(M))
-
+        plt.legend(loc='best')
+        plt.title('M = {}, SSE = {:.2f}'.format(M, SSE))
+        plt.tight_layout()
         plt.savefig(out_png)
     return weights
 
 def main():
     X, Y = getData(False)
     ndata = len(X)
-    for M in (0,1,3,10):
+    for M in (0,1,2,3,4,6,8,10):
         print 'M=%i' % M
         weights = fit_polynomial(X,Y,M,'regress_m_%i.png' % M)
         print weights
