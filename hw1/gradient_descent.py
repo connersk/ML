@@ -1,9 +1,10 @@
 import numpy as np
 
-def run_gradient_descent(func, deriv, x0, h, tol):
+def run_gradient_descent(func, deriv, x0, h, tol, return_error=False):
     x = []
     d = []
     f = []
+    err = []
     iterations = 0
     while 1:
         dx0 = deriv(x0)
@@ -15,13 +16,17 @@ def run_gradient_descent(func, deriv, x0, h, tol):
         fx1 = func(x1)
         fx0 = func(x0)
         f.append(fx0)
+        err.append(abs(fx1-fx0))
         if np.all(abs(fx1-fx0) < tol):
             x.append(x1)
             f.append(fx1)
             break
         x0 = x1
         iterations += 1
-    return x, d, f, iterations
+    if return_error:
+        x, d, f, iterations, err
+    else:
+        return x, d, f, iterations
 
 
 def central_difference(func, step,x):
