@@ -223,9 +223,7 @@ def plot_finite_diff_vs_gradient(objective, gradient, obj_args, finite_steps,col
 	
 
 def main():
-    #X, Y = loadFittingDataP1.getData()
-    #Y = Y.reshape((100,1))
-    #w_opt = np.dot(np.dot(np.linalg.inv(np.dot(X.T,X)), X.T), Y)
+
     gaussMean,gaussCov,quadBowlA,quadBowlb = loadParametersP1.getData()
     gaussMean = gaussMean.reshape((2,1))
     quadBowlb = quadBowlb.reshape((2,1))
