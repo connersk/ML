@@ -67,6 +67,7 @@ def stochastic_gradient_descent(func, deriv, X, Y, weights0, tau, k, tol, maxloo
             break
     return weights1, t
 
+
 def polynomial_design_matrix(x, M):
     '''
     Create the design matrix for a polynomial basis
