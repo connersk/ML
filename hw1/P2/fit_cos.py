@@ -38,7 +38,7 @@ def fit_cosines(X, Y, M, out_png=None):
         plt.plot(X,np.array(Y),'o',color='blue', label='data')
 
         xp = np.linspace(0, 1, 100)
-        y_model = np.cos(np.pi*xp) + 1.5*np.cos(2*np.pi*xp)
+        y_model = np.cos(np.pi*xp) + np.cos(2*np.pi*xp)
         plt.plot(xp, y_model, color='orange', label='data')
 
         y_regress = np.dot(cosine_design_matrix(xp,M), weights.reshape((nparams,1)))
@@ -57,11 +57,10 @@ def main():
     X, Y = getData(False)
     ndata = len(X)
     for M in (1,2,3,4,5,6,7,8):
-        print 'M=%i' % M
         weights = fit_cosines(X,Y,M,'regress_cos_m_%i.png' % M)
-        print weights
-        print 'SSE = {}'.format(gradient_descent.least_squares_objective(weights, cosine_design_matrix(X, M), Y.reshape((ndata,1))))
-        print 'SSE derivative = {}'.format(gradient_descent.least_squares_gradient(weights, cosine_design_matrix(X, M), Y.reshape((ndata,1))))
+        print 'M=%i & ' % M, 'w = ', [round(w,3) for w in weights[:,0]], '\\\\'
+        #print 'SSE = {}'.format(gradient_descent.least_squares_objective(weights, cosine_design_matrix(X, M), Y.reshape((ndata,1))))
+        #print 'SSE derivative = {}'.format(gradient_descent.least_squares_gradient(weights, cosine_design_matrix(X, M), Y.reshape((ndata,1))))
 
 
 if __name__ == '__main__':
