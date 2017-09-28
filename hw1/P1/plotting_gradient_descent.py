@@ -10,14 +10,18 @@ sys.path.insert(0,os.path.join(os.path.dirname(__file__),'..'))
 #import pdb; pdb.set_trace()
 import gradient_descent
 
-def plot_gradient_descent(objective, gradient, obj_args,initial_guess,h,cc, out_png=None, return_vals=False,return_x=False):
+def plot_gradient_descent(objective, gradient, obj_args,initial_guess,h,cc, out_png=None, return_vals=False,return_x=False,stochastic=False):
     '''Problem 1.1'''
 
-    x_res, d_res, f_res, iters = gradient_descent.run_gradient_descent(lambda x: objective(obj_args[0],obj_args[1],x),
-    	lambda x: gradient(obj_args[0],obj_args[1],x), initial_guess, h, cc)
+    if stochastic:
+    	iters, f_out, f_diff = gradient_descent.stochastic_gradient_descent(objective, gradient, )
 
-    f_out = np.concatenate(f_res).ravel().tolist()
-    f_diff =  [f_out[i+1]-f_out[i] for i in range(len(f_out)-1)]
+    else:
+    	x_res, d_res, f_res, iters = gradient_descent.run_gradient_descent(lambda x: objective(obj_args[0],obj_args[1],x),
+    		lambda x: gradient(obj_args[0],obj_args[1],x), initial_guess, h, cc)
+
+    	f_out = np.concatenate(f_res).ravel().tolist()
+    	f_diff =  [f_out[i+1]-f_out[i] for i in range(len(f_out)-1)]
 
     print x_res[-1], f_res[-1]
 
@@ -215,7 +219,7 @@ def plot_finite_diff_vs_gradient(objective, gradient, obj_args, finite_steps,col
 		plt.plot(range(0,iters + 1), exact_approx_differences[i][:-1], cols[i],label=labels[i])
 	ax.set_xlabel('Iterations')
 	ax.set_ylabel('Norm of exact gradient - approximate gradient',color='k')
-	plt.title("Quatratic: Gradient differences")   
+	plt.title(func_type + ": Gradient differences")   
 	plt.legend(labels,shadow=True,fancybox=True)	
 	plt.savefig(out_png)
 		
@@ -228,71 +232,98 @@ def main():
     gaussMean = gaussMean.reshape((2,1))
     quadBowlb = quadBowlb.reshape((2,1))
 
+    # print gaussMean
+    # print gaussCov
+
+    # maxval = 20
+    # minval = 0
+    # step = 1
+
+    # x1, x2 = np.mgrid[slice(minval, maxval, step), slice(minval, maxval, step)]
+    # z = np.empty(((maxval-minval)/step,(maxval-minval)/step))
+    # for i in range(0,len(x2)):
+    #     for j in range(0,len(x2[0])):
+    #         x_ij = np.array([x1[i][j],x2[i][j]])
+    #         z[i][j] = np.log(np.linalg.norm(gaussian_gradient(gaussMean, gaussCov, x_ij)- gradient_descent.central_difference(lambda x: gaussian_objective(gaussMean, gaussCov,x),1, x_ij).reshape((2,1))))
+    # z_min, z_max = -np.abs(z).max(), np.abs(z).max()
+
+    # z = (1 - x1 / 2. + x1 ** 5 + x2 ** 3) * np.exp(-x1 ** 2 - x2 ** 2)
+    # print np.log(z)
+
+    # fig, ax = plt.subplots()
+    # plt.pcolor(x1, x2, np.log(z), cmap='RdBu')
+    # plt.title('pcolor')
+    # # set the limits of the plot to the limits of the data
+    # plt.axis([x1.min(), x1.max(), x2.min(), x2.max()])
+    # plt.colorbar()
+    # plt.savefig("test_heatmap.png")
+
+
     
     #####################################################################################
     # Effect of start guess
     #####################################################################################
 
-    # Quadratic
-    start_guess(objective=quadratic_objective, gradient=quadratic_gradient, obj_params=[quadBowlA,quadBowlb],
-    	points=[[(80/3.)-10.,(80/3.)-10.],[(80/3.)-10.,(80/3.)+10.],[(80/3.),(80/3.)-20.],[(80/3.)-20.,(80/3.)-20.],[30.,30.]],
-    	cols = ['b^','ko','r-','cv','g>'], h=10**(-2),cc=10**(1),func_type="Quadratic",out_png="quadratic_starting.png")
+ #    # Quadratic
+ #    start_guess(objective=quadratic_objective, gradient=quadratic_gradient, obj_params=[quadBowlA,quadBowlb],
+ #    	points=[[(80/3.)-10.,(80/3.)-10.],[(80/3.)-10.,(80/3.)+10.],[(80/3.),(80/3.)-20.],[(80/3.)-20.,(80/3.)-20.],[30.,30.]],
+ #    	cols = ['b^','ko','r-','cv','g>'], h=10**(-2),cc=10**(1),func_type="Quadratic",out_png="quadratic_starting.png")
 
-    #      #Notes, blue 16,15 converges faster than black 16,26 even tho it starts off worse, which makes sense due to
-    # 		#co-dependence
-    # 	#otherwise, close things pretty much
+ #    #      #Notes, blue 16,15 converges faster than black 16,26 even tho it starts off worse, which makes sense due to
+ #    # 		#co-dependence
+ #    # 	#otherwise, close things pretty much
 
-    # Gaussian
-    start_guess(objective=gaussian_objective, gradient=gaussian_gradient, obj_params=[gaussMean,gaussCov],
-    	points=[[5.,10.],[5.,15.],[15.,15.],[2.5,10.],[12.5,12.5]],
-    	cols = ['b^','ko','r-','cv','g>'], h=10**(-2),cc=10**(-2),func_type="Gaussian",out_png="gaussian_starting.png")
+ #    # Gaussian
+ #    start_guess(objective=gaussian_objective, gradient=gaussian_gradient, obj_params=[gaussMean,gaussCov],
+ #    	points=[[5.,10.],[5.,15.],[15.,15.],[2.5,10.],[12.5,12.5]],
+ #    	cols = ['b^','ko','r-','cv','g>'], h=10**(-2),cc=10**(-2),func_type="Gaussian",out_png="gaussian_starting.png")
 
-    #####################################################################################
-    # Effect of step size
-    #####################################################################################
+ #    #####################################################################################
+ #    # Effect of step size
+ #    #####################################################################################
 
-    # Quadratic
-    step_size_effect(objective=quadratic_objective, gradient=quadratic_gradient, obj_params=[quadBowlA,quadBowlb],
-    	steps=[0.001,0.005,0.01,0.05,0.1],
-    	cols = ['b^','ko','r-','cv','g>'], start_guess=[(80/3.)-10,(80/3)-10],
-    	cc=10**(1),func_type="Quadratic",out_png="quadratic_step_size.png")
+ #    # Quadratic
+ #    step_size_effect(objective=quadratic_objective, gradient=quadratic_gradient, obj_params=[quadBowlA,quadBowlb],
+ #    	steps=[0.001,0.005,0.01,0.05,0.1],
+ #    	cols = ['b^','ko','r-','cv','g>'], start_guess=[(80/3.)-10,(80/3)-10],
+ #    	cc=10**(1),func_type="Quadratic",out_png="quadratic_step_size.png")
 
-    # Gaussian
-    step_size_effect(objective=gaussian_objective, gradient=gaussian_gradient, obj_params=[gaussMean,gaussCov],
-		steps=[0.001,0.005,0.01,0.05,0.1],
-		cols = ['b^','ko','r-','cv','g>'], start_guess=[12,12],
-		cc=10**(-2),func_type="Gaussian",out_png="guassian_step_size.png")
+ #    # Gaussian
+ #    step_size_effect(objective=gaussian_objective, gradient=gaussian_gradient, obj_params=[gaussMean,gaussCov],
+	# 	steps=[0.001,0.005,0.01,0.05,0.1],
+	# 	cols = ['b^','ko','r-','cv','g>'], start_guess=[12,12],
+	# 	cc=10**(-2),func_type="Gaussian",out_png="guassian_step_size.png")
 
-	#####################################################################################
-    # Effect of Convergence Criteria
-    #####################################################################################
+	# #####################################################################################
+ #    # Effect of Convergence Criteria
+ #    #####################################################################################
 
-    #Not so sure that I actually want to go with these plots, if I have time, convert to num iterations
-    	# vs distance from the global minimum and then label the points in the plot
+ #    #Not so sure that I actually want to go with these plots, if I have time, convert to num iterations
+ #    	# vs distance from the global minimum and then label the points in the plot
 
-    # Quadratic
-    covergence_criteria_effect(objective=quadratic_objective, gradient=quadratic_gradient, 
-    	obj_params=[quadBowlA,quadBowlb],ccs=[0.001,0.01,0.1,1],
-    	cols = ['b^','ko','r-','cv','g>'], start_guess=[(80/3.)-10,(80/3)-10],
-    	step=10**(-2),func_type="Quadratic",out_png="quadratic_convergence_criteria.png")
+ #    # Quadratic
+ #    covergence_criteria_effect(objective=quadratic_objective, gradient=quadratic_gradient, 
+ #    	obj_params=[quadBowlA,quadBowlb],ccs=[0.001,0.01,0.1,1],
+ #    	cols = ['b^','ko','r-','cv','g>'], start_guess=[(80/3.)-10,(80/3)-10],
+ #    	step=10**(-2),func_type="Quadratic",out_png="quadratic_convergence_criteria.png")
 
-    # Gaussian
-    covergence_criteria_effect(objective=gaussian_objective, gradient=gaussian_gradient, 
-    	obj_params=[gaussMean,gaussCov],ccs=[0.001,0.01,0.1,1],
-    	cols = ['b^','ko','r-','cv','g>'], start_guess=[12,12],
-    	step=10**(-2),func_type="Gaussian",out_png="gaussian_convergence_criteria.png")
+ #    # Gaussian
+ #    covergence_criteria_effect(objective=gaussian_objective, gradient=gaussian_gradient, 
+ #    	obj_params=[gaussMean,gaussCov],ccs=[0.001,0.01,0.1,1],
+ #    	cols = ['b^','ko','r-','cv','g>'], start_guess=[12,12],
+ #    	step=10**(-2),func_type="Gaussian",out_png="gaussian_convergence_criteria.png")
 
-   	#####################################################################################
-    # Evolution of the norm of the gradient
-    #####################################################################################
+ #   	#####################################################################################
+ #    # Evolution of the norm of the gradient
+ #    #####################################################################################
 
-    plot_norm_of_gradient(objective=quadratic_objective, gradient=quadratic_gradient, 
-    	obj_args= [quadBowlA,quadBowlb],start_guess=np.array([(80/3.)-10,(80/3)-10]), step=10**(-2),
-    	cc=10**1, func_type="Quadratic", out_png="quadratic_gradient_norm.png")
+ #    plot_norm_of_gradient(objective=quadratic_objective, gradient=quadratic_gradient, 
+ #    	obj_args= [quadBowlA,quadBowlb],start_guess=np.array([(80/3.)-10,(80/3)-10]), step=10**(-2),
+ #    	cc=10**1, func_type="Quadratic", out_png="quadratic_gradient_norm.png")
 
-    plot_norm_of_gradient(objective=gaussian_objective, gradient=gaussian_gradient, 
-    	obj_args= [gaussMean,gaussCov],start_guess=np.array([12,12]), step=10**(-2),
-    	cc=10**(-2), func_type="Gaussian", out_png="gaussian_gradient_norm.png")
+ #    plot_norm_of_gradient(objective=gaussian_objective, gradient=gaussian_gradient, 
+ #    	obj_args= [gaussMean,gaussCov],start_guess=np.array([12,12]), step=10**(-2),
+ #    	cc=10**(-2), func_type="Gaussian", out_png="gaussian_gradient_norm.png")
 
 
    	#####################################################################################
@@ -311,6 +342,16 @@ def main():
 		start_guess=np.array([12,12]), step=10**(-2),
 		cc=10**(-2), func_type="Gaussian", out_png="gaussian_finite_difference.png")
 	#notes: scales more so with the values now but way higher error values
+
+
+	#Making a heatmap of the Gaussian finite difference approximation stuff
+	# plot_finite_diff_vs_gradient(objective=gaussian_objective, gradient=gaussian_gradient, 
+	# 	obj_args= [gaussMean, gaussCov], finite_steps = [1,2.5,5,10,100], cols = ['b-','k-','r-','c-','g-'],
+	# 	start_guess=np.array([12,12]), step=10**(-2),
+	# 	cc=10**(-2), func_type="Gaussian", out_png="test_heatmap.png",heatmap=False)
+
+	# calcualting approx gradiet for different finite difference step sizes
+
 
 
 
