@@ -3,7 +3,7 @@
 \usepackage{amsmath,amsthm,amssymb,amsfonts}
 \usepackage{enumitem} 
 \usepackage{graphicx}
-\graphicspath{ {../P2/} {../P3/} {../P4/}}
+\graphicspath{ {../P2/} {../P3_ellen/} {../P4/}}
 \usepackage{listings}
 \usepackage{color}
  
@@ -41,7 +41,7 @@
  
 \begin{document}
  
-\title{Numerical methods for linear regression}
+\title{Techniques for linear regression}
 \author{[redacted]}
 \maketitle
  
@@ -69,10 +69,7 @@ $$w = (\Phi^T\Phi)^{-1}\Phi^Ty$$
 
 Eleven data points were generated under the following function with added noise:
 
-
 $$f(x) = cos(\pi x) + cos(2\pi x); x \in [0,1]$$
-
-
 
 Ignoring the true basis, we instead try to fit the data using a polynomial basis $\phi_0(x) = 1, \phi_1(x) = x, \phi_2(x) = x^2, ... , \phi_M(x) = x^M$, with GLS.  Figure 1 shows the tradeoff between model complexity and the quality of fit to the *training data*. At M=0 and M=1, the model is too simple and we have a large SSE. At the other extreme, with M=10, the model is able to exactly fit in the input data (SSE=0), however, with this little data, we are extremely susceptible to overfitting to the noise in the input data. Indeed, at high values of M, our fitted polynomials oscillate between points, thus deviating from the true model even within the range of the training data. Furthermore, since we know the true model is a sum of cosines, the extrapolative power of any of these polynomial basis models outside the training range of $x \in [0,1]$ is poor, thus underscoring the danger of using a model to predict outside the range of its training data.
 
@@ -103,21 +100,36 @@ Ignoring the true basis, we instead try to fit the data using a polynomial basis
 
 \subsection{Performance of BGD and SGD}
 
-Next we explore the performance of BGD and SGD on the same fitting problem with linear polynomial basis functions. The optimized values of $w$ are shown in Table {ref}. We note that both BGD and SGD have trouble reproducing the optimal values of $w$ for higher order polynomials. This is a consequence of both having a model that is too complex for the given data and the stopping criterion in gradient descent methods; since there are a large number of higher order polynomials that can approximate our 11 data points, the SSE between any two of these functions will be small. As a result, changing the starting values of affects the optimized values of $w$. Additionally, if the convergence threshold is set to an extremely low value, the number of iterations goes up drastically since the gradient between near optimal solutions is very low (Figure). SGD is less susceptible to this problem since the algorithm is inherently noiser. Finally, since our underlying data was generated from a cosine basis, i.e. even functions, we note that odd values of M required more/fewer iterations to convergence.
+\begin{figure}
+\caption{Gradient descent methods have trouble reproducing the analytically computed optimal weights for higher order polynomials.}
+\begin{center}
+\includegraphics[width=200px]{all_weights}
+\end{center}
+\label{fig:gd_weights}
+\end{figure}
 
-% table with BGD weights and SGD weights 
-% Figure with number of iterations vs. tolerance for different values of M
+\begin{figure}
+\caption{As the polynomial order M increases, the number of iterations to convergence increases.}
+\begin{center}
+\includegraphics[width=200px]{iter_vs_M}
+\end{center}
+\label{fig:iter_vs_M}
+\end{figure}
+
+Next we explore the performance of BGD and SGD on the same fitting problem with linear polynomial basis functions. The optimized values of $w$ are shown in Figure \ref{fig;gd_weights}. We note that both BGD and SGD have trouble reproducing the optimal values of $w$ for higher order polynomials (Figure \ref{fig:gd_weights}). This is a consequence of both having a model that is too complex for the given data and the stopping criterion in gradient descent methods; since there are a large number of higher order polynomials that can approximate our 11 data points, the SSE between any two of these functions will be small. As a result, changing the starting values of affects the optimized values of $w$. Additionally, if the convergence threshold is set to an extremely low value, the number of iterations goes up drastically since the gradient between near optimal solutions is very low. SGD is less susceptible to this problem since the algorithm is inherently noiser. Finally, since our underlying data was generated from a cosine basis, i.e. even functions, we note that increasing the order to an odd values usually leads to sharp increases in the number of iterations to convergence (Figure \ref{fig:iter_vs_M}).
 
 \subsection{Linear regression with a cosine basis}
-
-Using a cosine basis of the form $\phi_1(x) = cos(\pi x), \phi_2(x) = cos(2\pi x), ... , phi_M(x) = cos(M\pi x)$, we fit the same data as in Section 2.1 (Figure 2). Since the cosine basis contains the true basis used to generate the data, we observe low SSE for $M>=2$ and a good qualitative match to the true model for intermediate values of M. At larger values of M, we start overfitting to the noise in the generated data. For example, at M=8, $w_{opt} =  (0.769, 1.087, 0.099, 0.143, -0.051, 0.362, 0.012, 0.015) $. While $w_1=0.77$ and $w_2=1.09$ are close to the true model $w_1 = w_2 = 1$, higher order terms have nonzero weight. In the next section, we discuss how regularization techniques may be used to enforce prior beliefs on our model parameters to avoid overfitting to noise.
 
 \begin{figure}
 \caption{As the cosine order M increases, the sum of square error (SSE) between the fitted model and the input data decreases, however the risk of overfitting increases.}
 \begin{center}
 \includegraphics[width=450px]{all_regress_cos}
 \end{center}
+\label{fig:cos_fitting}
 \end{figure}
+
+Using a cosine basis of the form $\phi_1(x) = cos(\pi x), \phi_2(x) = cos(2\pi x), ... , phi_M(x) = cos(M\pi x)$, we fit the same data as in Section 2.1 (Figure \ref{fig:cos_fitting}). Since the cosine basis contains the true basis used to generate the data, we observe low SSE for $M>=2$ and a good qualitative match to the true model for intermediate values of M. At larger values of M, we start overfitting to the noise in the generated data. For example, at M=8, $w_{opt} =  (0.769, 1.087, 0.099, 0.143, -0.051, 0.362, 0.012, 0.015) $. While $w_1=0.77$ and $w_2=1.09$ are close to the true model $w_1 = w_2 = 1$, higher order terms have nonzero weight. In the next section, we discuss how regularization techniques may be used to enforce prior beliefs on our model parameters to avoid overfitting to noise.
+
 
 %\begin{table}
 %\caption{Fitted weight vectors for linear regression of Equation [ref] with cosine basis functions of increasing order.}
@@ -144,6 +156,31 @@ Ridge regression is a simple extension of generalized least squares which includ
 $$f(w,x) = \Phi w + \lambda w^Tw$$
 
 In a Baeysian framework, ridge regression represents including a prior that our weight parameters come from a gaussian distribution. In a frequentist framework, ridge regression is interpreted as adding a bias to our weight parameters in order to reduce the variance in our optimized weights. An advantage of regularization is that it allows model complexity to be tuned by adjusting the value of $\lambda$. In this section, we see how adding regularization affects our regressed parameters and how it allows us to fit a complex model to our data without severe overfitting.
+
+\begin{figure}
+\caption{As the polynomial order M increases, the number of iterations to convergence increases.}
+\begin{center}
+\includegraphics[width=200px]{P3_all_weights}
+\end{center}
+\label{fig:P3_all_weights}
+\end{figure}
+
+\begin{figure}
+\caption{As the polynomial order M increases, the number of iterations to convergence increases.}
+\begin{center}
+\includegraphics[width=200px]{P3_AIC}
+\end{center}
+\label{fig:P3_AIC}
+\end{figure}
+
+\begin{figure}
+\caption{As the polynomial order M increases, the number of iterations to convergence increases.}
+\begin{center}
+\includegraphics[width=200px]{P3_test}
+\end{center}
+\label{fig:P3_test}
+\end{figure}
+
 
 We performed ridge regression with a polynomial basis on the same data set as in Section 2.1. We see that at M=8, using ridge regression dramatically reduces the magnitude of the fitted parameters and avoids overfitting. At sufficiently high values of lambda, we see our error function increase and the quality of fit decrease as our fitted function approaches a flat line.
 
