@@ -1,0 +1,2 @@
+montage -geometry +4+3 -tile 2x3 weights_1_trainA.png weights_1_trainB.png weights_3_trainA.png weights_3_trainB.png weights_8_trainA.png weights_8_trainB.png P3_all_weights.png 
+montage -geometry +4+3 -tile 1x2 AIC_A.png AIC_B.png P3_AIC.png
