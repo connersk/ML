@@ -1,0 +1,3 @@
+ montage -geometry +4+3 -tile 2x2 w_true.png w_lasso.png w_ridge.png w_noreg.png w_all.png
+montage -geometry +4+3 -tile 2x2 train_lasso.png train_ridge.png training_errors.png ridge_training_errors.png all_training.png
+montage -gravity center -geometry +4+3 -tile 1x2 all_fitting.png w_all.png final_fitting_results.png
