@@ -30,9 +30,18 @@ def main():
     batch_iterations = []
     batch_weights = []
     batch_diff = []
+    batch_f = []
     stochastic_iterations = []
     stochastic_weights = []
     stochastic_diff = []
+    stochastic_f = []
+
+    
+    fig, ax = plt.subplots()
+    #labels = map(lambda x: str([round(i,2) for i in x]), points)
+
+
+    start_points = [np.zeros((10,1))]
 
     for point in start_points:
 
@@ -47,13 +56,26 @@ def main():
     	batch_weights.append(w_batch[-1])
     	batch_iterations.append(iters_batch*100) #since every batch iteration is 1 round of the whole dataset
     	batch_diff.append(np.linalg.norm(w_opt - w_batch[-1])/np.linalg.norm(w_opt))
+        batch_f.append(f_batch)
+        plt.plot(range(0,iters_batch+1), map(np.log, f_batch[:-1]),color="k")
 
     	#stochastic gd
-    	w_sgd, iters_sgd = gradient_descent.stochastic_gradient_descent(func=least_squares_objective, 
-    		deriv = least_squares_gradient, X=X, Y=Y, weights0=point, tau=10.**8,k=.75,tol=.1)
+    	w_sgd, iters_sgd, err_sgd, f_sgd  = gradient_descent.stochastic_gradient_descent(func=least_squares_objective, 
+    		deriv = least_squares_gradient, X=X, Y=Y, weights0=point, tau=10.**8,k=.75,tol=.1, return_f=True)
     	stochastic_weights.append(w_sgd)
     	stochastic_iterations.append(iters_sgd)
     	stochastic_diff.append(np.linalg.norm(w_opt - w_sgd)/np.linalg.norm(w_opt))
+        stochastic_f.append(stochastic_f)
+        print iters_sgd/100
+        print len(f_sgd)
+        plt.plot(range(0,iters_sgd/100), map(np.log, f_sgd),color="b")
+
+
+    ax.set_xlabel('Iterations')
+    ax.set_ylabel('Objective function',color='k')
+    plt.title("Least Squares Objective stuff")   
+    #plt.legend(labels,shadow=True,fancybox=True)    
+    plt.show()
 
     print "batch iterations"
     print batch_iterations
@@ -66,6 +88,7 @@ def main():
     print stochastic_diff
 
     #idk if this really needs a graph or not
+
 
     
 

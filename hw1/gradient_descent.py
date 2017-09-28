@@ -46,11 +46,12 @@ def least_squares_gradient(weights, X, Y):
 def analytic_least_squares(X,Y):
     return np.dot(np.dot(np.linalg.inv(np.dot(X.T,X)), X.T), Y)
 
-def stochastic_gradient_descent(func, deriv, X, Y, weights0, tau, k, tol, maxloops=100000, return_error=False):
+def stochastic_gradient_descent(func, deriv, X, Y, weights0, tau, k, tol, maxloops=100000, return_error=False, return_f=False):
     ndata = np.shape(X)[0]
     nparams = np.shape(weights0)[0]
     t = 0
     err = []
+    f = []
     while 1:
         order = range(ndata)
         np.random.shuffle(order)
@@ -67,9 +68,12 @@ def stochastic_gradient_descent(func, deriv, X, Y, weights0, tau, k, tol, maxloo
                 raise RuntimeError, "Maxloops exceeded. Last 10 values of error: {}".format(err[-10:])
         fx1 = func(weights1,X,Y)
         fx0 = func(weights0_copy,X,Y)
+        f.append(fx0)
         err.append(abs(fx1-fx0))
         if abs(fx1-fx0) < tol:
             break
+    if return_f:
+        return weights1, t, err, f
     if return_error:
         return weights1, t, err
     else:
