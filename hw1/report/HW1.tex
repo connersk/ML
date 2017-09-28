@@ -1,9 +1,9 @@
-\documentclass[12pt]{article}
+\documentclass[10pt]{article}
 \usepackage[margin=1in]{geometry} 
 \usepackage{amsmath,amsthm,amssymb,amsfonts}
 \usepackage{enumitem} 
 \usepackage{graphicx}
-\graphicspath{ {../P2/} }
+\graphicspath{ {../P2/} {../P3/} {../P4/}}
 \usepackage{listings}
 \usepackage{color}
  
@@ -64,8 +64,6 @@ Alternative formulations of the problem exist where we simultaneously consider t
 The minimization of $\theta$ for linear basis functions has a closed form solution (Equation [below]). In the subsequent sections, we explore the tradeoffs between different choices of basis functions, and we use the analytically computed weights for various choices of linear basis function to benchmark gradient descent minimization of $\theta$ and gain intuition on its convergence properties. 
 
 $$w = (\Phi^T\Phi)^{-1}\Phi^Ty$$
-% todo: Talk about connection to maximum likelihood?
-% todo: look up how to number equations...
 
 \subsection{Linear regression with a polynomial basis}
 
@@ -85,22 +83,22 @@ Ignoring the true basis, we instead try to fit the data using a polynomial basis
 \end{center}
 \end{figure}
 
-\begin{table}
-\caption{Fitted weight vectors for linear regression of Equation [ref] with linear basis functions of increasing order.}
-\begin{center}
-\begin{tabular}{r | l}
-M=0 &  w =  [-0.001] \\
-M=1 &  w =  [0.906, -1.813] \\
-M=2 &  w =  [2.456, -12.15, 10.338] \\
-M=3 &  w =  [2.367, -10.731, 6.616, 2.481] \\
-M=4 &  w =  [2.341, -9.819, 2.055, 9.779, -3.649] \\
-M=6 &  w =  [2.304, -12.728, 63.938, -335.924, 783.22, -784.539, 284.565] \\
-M=8 &  w =  [2.278, 38.737, -972.518, 7401.42, -27960.868, 58014.38, -67074.038, 40504.018, -9952.576] \\
-M=10 &  w =  [2.278, -73.082, 2283.818, -30586.685, 208190.139, -813749.26, 1934260.6, -2841219.608, 2518054.828, -1233682.014, 256519.873] \\
-\end{tabular}
-\end{center}
-\label{poly_weights}
-\end{table}
+%\begin{table}
+%\caption{Fitted weight vectors for linear regression of Equation [ref] with linear basis functions of increasing order.}
+%\begin{center}
+%\begin{tabular}{r | l}
+%M=0 &  w =  [-0.001] \\
+%M=1 &  w =  [0.906, -1.813] \\
+%M=2 &  w =  [2.456, -12.15, 10.338] \\
+%M=3 &  w =  [2.367, -10.731, 6.616, 2.481] \\
+%M=4 &  w =  [2.341, -9.819, 2.055, 9.779, -3.649] \\
+%M=6 &  w =  [2.304, -12.728, 63.938, -335.924, 783.22, -784.539, 284.565] \\
+%M=8 &  w =  [2.278, 38.737, -972.518, 7401.42, -27960.868, 58014.38, -67074.038, 40504.018, -9952.576] \\
+%M=10 &  w =  [2.278, -73.082, 2283.818, -30586.685, 208190.139, -813749.26, 1934260.6, -2841219.608, 2518054.828, -1233682.014, 256519.873] \\
+%\end{tabular}
+%\end{center}
+%\label{poly_weights}
+%\end{table}
 
 
 \subsection{Performance of BGD and SGD}
@@ -112,7 +110,7 @@ Next we explore the performance of BGD and SGD on the same fitting problem with 
 
 \subsection{Linear regression with a cosine basis}
 
-Using a cosine basis of the form $\phi_1(x) = cos(\pi x), \phi_2(x) = cos(2\pi x), ... , phi_M(x) = cos(M\pi x)$, we fit the same data as in Section 2.1 (Figure 2). Since the cosine basis contains the true basis used to generate the data, we observe low SSE for M=2 and higher and a good qualitative match to the true model for intermediate values of M. At larger values of M, we start overfitting to the noise in the generated data. For example, at M=8, $w_1=0.77$ and $w_2=1.09$ are close to the true model $w_1 = w_2 = 1$, however higher order terms have nonzero weight. In the next section, we discuss regularization techniques which may be used to enforce prior beliefs on our model and its parameters and avoid overfitting to noise.
+Using a cosine basis of the form $\phi_1(x) = cos(\pi x), \phi_2(x) = cos(2\pi x), ... , phi_M(x) = cos(M\pi x)$, we fit the same data as in Section 2.1 (Figure 2). Since the cosine basis contains the true basis used to generate the data, we observe low SSE for $M>=2$ and a good qualitative match to the true model for intermediate values of M. At larger values of M, we start overfitting to the noise in the generated data. For example, at M=8, $w_{opt} =  (0.769, 1.087, 0.099, 0.143, -0.051, 0.362, 0.012, 0.015) $. While $w_1=0.77$ and $w_2=1.09$ are close to the true model $w_1 = w_2 = 1$, higher order terms have nonzero weight. In the next section, we discuss how regularization techniques may be used to enforce prior beliefs on our model parameters to avoid overfitting to noise.
 
 \begin{figure}
 \caption{As the cosine order M increases, the sum of square error (SSE) between the fitted model and the input data decreases, however the risk of overfitting increases.}
@@ -121,24 +119,23 @@ Using a cosine basis of the form $\phi_1(x) = cos(\pi x), \phi_2(x) = cos(2\pi x
 \end{center}
 \end{figure}
 
-\begin{table}
-\caption{Fitted weight vectors for linear regression of Equation [ref] with cosine basis functions of increasing order.}
-\begin{center}
-\begin{tabular}{r | l}
-
-M=1 &  w =  [0.779] \\
-M=2 &  w =  [0.779, 1.174] \\
-M=3 &  w =  [0.763, 1.174, 0.094] \\
-M=4 &  w =  [0.763, 1.141, 0.094, 0.197] \\
-M=5 &  w =  [0.77, 1.141, 0.101, 0.197, -0.049] \\
-M=6 &  w =  [0.77, 1.089, 0.101, 0.145, -0.049, 0.363] \\
-M=7 &  w =  [0.769, 1.089, 0.099, 0.145, -0.051, 0.363, 0.012] \\
-M=8 &  w =  [0.769, 1.087, 0.099, 0.143, -0.051, 0.362, 0.012, 0.015] \\
-\end{tabular}
-\end{center}
-\label{cosine_weights}
-
-\end{table}
+%\begin{table}
+%\caption{Fitted weight vectors for linear regression of Equation [ref] with cosine basis functions of increasing order.}
+%\begin{center}
+%\begin{tabular}{r | l}
+%
+%M=1 &  w =  [0.779] \\
+%M=2 &  w =  [0.779, 1.174] \\
+%M=3 &  w =  [0.763, 1.174, 0.094] \\
+%M=4 &  w =  [0.763, 1.141, 0.094, 0.197] \\
+%M=5 &  w =  [0.77, 1.141, 0.101, 0.197, -0.049] \\
+%M=6 &  w =  [0.77, 1.089, 0.101, 0.145, -0.049, 0.363] \\
+%M=7 &  w =  [0.769, 1.089, 0.099, 0.145, -0.051, 0.363, 0.012] \\
+%M=8 &  w =  [0.769, 1.087, 0.099, 0.143, -0.051, 0.362, 0.012, 0.015] \\
+%\end{tabular}
+%\end{center}
+%\label{cosine_weights}
+%\end{table}
 
 \section{Ridge Regression}
 
@@ -175,10 +172,30 @@ While the regularization in ridge regression penalizes high value parameters, LA
 We trained, validated, and tested a dataset generated according to $y=w_{true}^T\phi(x) + \epsilon$, where $x,y \in \R, w \in \R^{13}$ and $\epsilon$ is a small noise. The feature vector is given by
 $$ \phi(x) = (x, sin(0.4\pi x), sin(2*0.4\pi x), sin(3*0.4\pi x),...,sin(12*0.4\pi x)) \in \R^13$$
 
-Finding the optimal LASSO weights has no closed form solution,
+\begin{figure}
+\caption{Training LASSO and ridge regularization.}
+\begin{center}
+\includegraphics[width=350px]{all_training}
+\end{center}
+\label{fig:train_lasso}
+\end{figure}
+
+Our training results for various values of $\lambda$ for LASSO and ridge regularization are given in Figure \ref{fig:train_lasso}. After training each model, we use the validation data set to evaluate each set of parameters and choose an appropriate model. We see an inverse relationship between goodness of fit to the data and the regularization penalty. In order to compare different models, we compute the Akaike information criterion (AIC) to assess the tradeoff between goodness of fit and model complexity. Based on our computed AIC, we select the model with $\lambda=0.01$ for LASSO and $\lambda=0.01$ for ridge regression.
+
+\begin{figure}
+\caption{Fitting results.}
+\begin{center}
+\includegraphics[width=200px]{final_fitting_results}
+\end{center}
+\label{fig:final_lasso_test}
+\end{figure}
+
+The optimized weights for each model is given in Figure \ref{fig:final_lasso_test} and a visualization of the fitted functions. While all models achieve a low error to the given data and qualitative agreement to the true model, visualizing the weights in the function shows that LASSO has most closely reproduced the true model. We also note that unregularized fitting yields parameters similar to ridge regression. This is likely a consequence of a small training set. We recommend combining the training and validation data sets used here and performing 3-fold cross validation for future work.
+
+ %Finding the optimal LASSO weights has no closed form solution.
 
 \section{Conclusions}
 
-We have introduced batch gradient descent and stochastic gradient descent, two numerical methods used in the optimization of loss functions. We then introduced how gradient descent may be used for the minimization of error functions in generalized least squares problems and compared its performance against the analytically derived optimums. In this context, model selection
+We have introduced batch gradient descent and stochastic gradient descent, two numerical methods used in the optimization of loss functions. We then introduced how gradient descent can be used in the context of generalized least squares and compared its performance for regression on linear models where there exists a closed form solution. We explore the relationship between the complexity of the model and the degree of overfitting in this data-poor context, thus motivating the introduction of regularization. We show how changing the regularization penalty tunes the model complexity, in particular, how ridge biases towards small parameter values and how ridge biases towards sparse values.
 
  \end{document}
