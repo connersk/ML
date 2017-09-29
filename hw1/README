@@ -1,0 +1,3 @@
+montage -geometry +4+3 -tile 2x1 -pointsize 38 -label "(a)" gaussian_finite_difference.png -label "(b)" quadratic_finite_difference.png all_finite_difference.png
+montage -geometry +4+3 -tile 2x2 -pointsize 38 -label "(a)" guassian_step_size.png -label "(b)" gaussian_starting.png -label "(c)" gaussian_convergence_criteria.png -label "(d)" gaussian_gradient_norm.png all_gaussian_gd.png
+montage -geometry +4+3 -tile 2x2 -pointsize 38 -label "(a)" quadratic_step_size.png -label "(b)" quadratic_starting.png -label "(c)" quadratic_convergence_criteria.png -label "(d)" quadratic_gradient_norm.png all_quadratic_gd.png
