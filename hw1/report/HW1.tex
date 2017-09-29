@@ -3,9 +3,14 @@
 \usepackage{amsmath,amsthm,amssymb,amsfonts}
 \usepackage{enumitem} 
 \usepackage{graphicx}
-\graphicspath{ {../P2/} {../P3_ellen/} {../P4/}}
+\graphicspath{ {../P2/} {../P3_ellen/} {../P4/}{../}}
 \usepackage{listings}
 \usepackage{color}
+ 
+\usepackage[caption = false]{subfig}
+\usepackage{sidecap}
+\usepackage[normalem]{ulem}
+\useunder{\uline}{\ul}{}
  
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -49,6 +54,65 @@ In this paper we explore methods for regression of simple linear models. In sect
 
 \section{Gradient Descent}
 
+\subsection{Batch Gradient Descent on Gaussian and Quadratic Objective Functions}
+
+ We implemented a basic batch gradient descent procedure for minimizing functions and tested this procedure on a Gaussian and  a quadratic function (Figure \ref{fig:1.1}). These functions have known minima at (10,10) and ($26.67,26.67$) respectively. This procedure takes in a constant step size, a starting guess vector, and a criteria for convergence. We examined the effects of these parameters.
+ 
+ \medskip
+
+ \textbf{Step Size}: For both functions, decreasing the step size caused the gradient descent procedure to converge slower (Fig \ref{fig:1.1}a,e). This makes sense as a smaller step size will cause a smaller update in each iteration. 
+ 
+  \textbf{Starting Guess}: The effect of the starting guess varied between the Gaussian and Quadratic functions (Fig \ref{fig:1.1}b,f). For the Gaussian function, whose minimum is at (10,10), the number of iterations to convergence increases as the Euclidean distance between the starting guess and true minimum increases. Furthermore since starting guesses (5,15) and (15,5) are the same distance from the minimum, they converge at exactly the same rate. On the other hand, the time to convergence of the quadratic function generally increases with the distance from the starting guess to the minimum, although not in all cases. Since the covariance of the two inputs is non-zero, the function produces different results for (16.67, 36.67) and (16.67, 16.67) which have the same Euclidean distance from the minimum at (26.67,26.67). When starting at (16.67,16.67) the function starts off higher but converges faster than when starting at (16.67,36.67). The convergence is slower at the second point because the covariation term will make it hard to increase the first variable while decreasing the second variable. 
+  
+\textbf{Convergence criteria}: For both functions there is an inverse relationship between the number of iterations to convergence and the $\log_{10}$ of the convergence criteria (Fig \ref{fig:1.1}c,g). This makes sense as decreasing the convergence criteria by a factor of 10 will mean that the gradient descent procedure must get closer to the true minimum before terminating
+
+\medskip
+Furthermore, for both functions we examined the norm of the gradient (Fig \ref{fig:1.1}d,h). In both cases, the norm of the gradient monotonically decreases and goes close to 0 at the time of convergence.
+
+\begin{figure}[!h]
+
+\subfloat[]{\includegraphics[width = 2in]{guassian_step_size.png}}
+\subfloat[]{\includegraphics[width = 2in]{gaussian_starting.png}}
+\subfloat[]{\includegraphics[width = 2in]{gaussian_convergence_criteria.png}}
+\subfloat[]{\includegraphics[width = 2in]{gaussian_gradient_norm.png}}
+\\
+
+\subfloat[]{\includegraphics[width = 2in]{quadratic_step_size.png}}
+\subfloat[]{\includegraphics[width = 2in]{quadratic_starting.png}}
+\subfloat[]{\includegraphics[width = 2in]{quadratic_convergence_criteria.png}}
+\subfloat[]{\includegraphics[width = 2in]{quadratic_gradient_norm.png}}
+\caption{Analysis of gradient descent on Gaussian and Quadratic function. }
+\label{fig:1.1}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\subfloat[]{\includegraphics[width = 2in]{gaussian_finite_difference.png}}
+\subfloat[]{\includegraphics[width = 2in]{quadratic_finite_difference.png}}
+
+\caption{The norm of the difference between the exact gradient and the central difference approximate gradient evaluated as the gradient descent procedure minimizes an objective function. Varied over different step sizes for the approximation. (A) Gaussian function with parameters from Fig 1d and (B) Quadratic function with parameters from Fig 1h}
+\label{fig:1.2}
+\end{figure}
+
+
+\subsection{Central Difference Approximation}
+
+ We used the central difference approximation to evaluate the value of the gradient during the course of a gradient descent procedure. Figure \ref{fig:1.2} displays the norm of the difference between the exact gradient and the approximate gradient over the course of gradient descent on the Gaussian and Quadratic functions. For the Gaussian function, the approximate gradient is much further from the exact gradient than is the case for the Quadratic function. This is because the secant line used by the central difference approximation is similar to the derivative of a quadratic function but is very different from the derivative of a Gaussian function. Note that the y-axis of Figure \ref{fig:1.2}a is on the scale of $10^1$ while the y-axis of Figure \ref{fig:1.2}b is on the scale of $10^{-10}$. Over this range of approximation step sizes, the Gaussian approximate gradient becomes more similar to the Gaussian gradient as the step sizes decreases. On the other hand, the Quadratic approximate gradient is most similar to the Quadratic exact gradient at a step size in the 1 to 10 range. At step sizes higher and lower the difference is greater. This is likely due to the fact that in the central difference approximation we move away from a point by the step size and divide the approximation by the step size. Thus too large of step size will move the approximation too far away, causing inaccuracy, while too small of a step size will produce a large value when the step size is divided, also creating inaccuracy. Thus there exists a sweet spot for the step size, where it is neither too large nor too small and produces the best results. 
+
+\subsection{Stochastic Gradient Descent}
+
+In addition to our batch gradient descent procedure, we implemented an alternative procedure using stochastic gradient descent. In this procedure, the learning rate at time $t$ is given by $\eta = (10^8 +t)^{-0.75}$. In Figure \ref{fig:1.3}, we compare batch and stochastic gradient descent when minimizing least squares data. For all starting points, stochastic gradient descent requires slightly more evaluations of the gradient than batch gradient descent does, although this difference is small relative to the total number of evaluations carried out. The similar number of iterations required by both methods is due to the fact that both of the objective functions are convex. If that was not true, we would expect stochastic gradient descent to work much better as it would more easily avoid local minima and saddle points when compared to batch gradient descent.
+
+\medskip
+
+Furthermore, batch gradient descent produces a weight vector whose relative distance from the ideal weight vector varies only slightly at the different start points. On the other hand, the relative distance of the weight vector with stochastic gradient descent varies much more so and is sometimes larger than that of batch gradient descent and sometimes smaller. This reflects the stochastic nature of stochastic gradient descent.
+
+\begin{figure}
+\centering
+\includegraphics[width=.4\textwidth,height =0.25\textheight]{batch_stochastic_comp.png}
+\caption{\label{fig:1.3}: Comparing batch and stochastic gradient descent for minimizing least squares objective. The number of gradient evaluations (blue) and the relative distance of the calculated weights from the ideal weights (red) for both batch gradient descent (solid line) and stochastic gradient descent (dotted line) at a variety of starting points.}
+\end{figure}
+
 \section{Linear Basis Function Regression}
 
 Linear models are a popular choice of regression model due to their computational simplicity and interpretability. In a linear model, the model $f$ used to predict the observed data is expressed as a linear combination of terms:
@@ -71,13 +135,14 @@ Eleven data points were generated under the following function with added noise:
 
 $$f(x) = cos(\pi x) + cos(2\pi x); x \in [0,1]$$
 
-Ignoring the true basis, we instead try to fit the data using a polynomial basis $\phi_0(x) = 1, \phi_1(x) = x, \phi_2(x) = x^2, ... , \phi_M(x) = x^M$, with GLS.  Figure 1 shows the tradeoff between model complexity and the quality of fit to the *training data*. At M=0 and M=1, the model is too simple and we have a large SSE. At the other extreme, with M=10, the model is able to exactly fit in the input data (SSE=0), however, with this little data, we are extremely susceptible to overfitting to the noise in the input data. Indeed, at high values of M, our fitted polynomials oscillate between points, thus deviating from the true model even within the range of the training data. Furthermore, since we know the true model is a sum of cosines, the extrapolative power of any of these polynomial basis models outside the training range of $x \in [0,1]$ is poor, thus underscoring the danger of using a model to predict outside the range of its training data.
+Ignoring the true basis, we instead try to fit the data using a polynomial basis $\phi_0(x) = 1, \phi_1(x) = x, \phi_2(x) = x^2, ... , \phi_M(x) = x^M$, with GLS.  Figure \ref{polyfit} shows fitted polynomials of variable order $M$ and highlights the tradeoff between model complexity and the quality of fit to the training data. At M=0 and M=1, the model is too simple and we have a large SSE. At the other extreme, with M=10, the model is able to exactly fit in the input data (SSE=0), including its noise. We see that at high values of M, our fitted polynomials oscillate between points and deviate from the true model even within the range of the training data. Furthermore, since we know the true model is a sum of cosines, the extrapolative power of any of these polynomial basis models outside the training range of $x \in [0,1]$ is poor, thus underscoring the danger of using a model to predict outside the range of its training data.
 
 \begin{figure}
-\caption{As the polynomial order M increases, the sum of square error (SSE) between the fitted polynomial and the input data decreases, however the risk of overfitting increases.}
+\caption{Input data and fitted models with polynomial basis functions. As the polynomial order M increases, the sum of square error (SSE) between the fitted polynomial and the input data decreases, however the risk of overfitting increases.}
 \begin{center}
 \includegraphics[width=450px]{all_regress_m}
 \end{center}
+\label{fig:polyfit}
 \end{figure}
 
 %\begin{table}
@@ -100,6 +165,8 @@ Ignoring the true basis, we instead try to fit the data using a polynomial basis
 
 \subsection{Performance of BGD and SGD}
 
+Next we explore the performance of BGD and SGD on the same fitting problem with linear polynomial basis functions. We observe that both BGD and SGD have trouble reproducing the optimal values of $w$ for higher order polynomials (Figure \ref{fig:gd_weights}). 
+
 \begin{figure}
 \caption{Gradient descent methods have trouble reproducing the analytically computed optimal weights for higher order polynomials.}
 \begin{center}
@@ -107,6 +174,8 @@ Ignoring the true basis, we instead try to fit the data using a polynomial basis
 \end{center}
 \label{fig:gd_weights}
 \end{figure}
+
+This is a consequence of both having a model that is too complex for the given data and the stopping criterion in gradient descent methods; since there are a large number of higher order polynomials that can approximate our 11 data points, the SSE between any two of these functions will be small. Accordingly, we observed that changing the starting values of affects the gradient descent solutions for $w$. Additionally, if the convergence threshold is set to an extremely low value, the number of iterations goes up drastically since the difference in the objective between near-optimal solutions is very low. SGD is less susceptible to this problem since the algorithm is inherently noiser. Finally, since our underlying data was generated from a cosine basis, i.e. even functions, we note that increasing the order to an odd values usually leads to sharp increases in the number of iterations to convergence (Figure \ref{fig:iter_vs_M}).
 
 \begin{figure}
 \caption{As the polynomial order M increases, the number of iterations to convergence increases.}
@@ -116,9 +185,9 @@ Ignoring the true basis, we instead try to fit the data using a polynomial basis
 \label{fig:iter_vs_M}
 \end{figure}
 
-Next we explore the performance of BGD and SGD on the same fitting problem with linear polynomial basis functions. The optimized values of $w$ are shown in Figure \ref{fig;gd_weights}. We note that both BGD and SGD have trouble reproducing the optimal values of $w$ for higher order polynomials (Figure \ref{fig:gd_weights}). This is a consequence of both having a model that is too complex for the given data and the stopping criterion in gradient descent methods; since there are a large number of higher order polynomials that can approximate our 11 data points, the SSE between any two of these functions will be small. As a result, changing the starting values of affects the optimized values of $w$. Additionally, if the convergence threshold is set to an extremely low value, the number of iterations goes up drastically since the gradient between near optimal solutions is very low. SGD is less susceptible to this problem since the algorithm is inherently noiser. Finally, since our underlying data was generated from a cosine basis, i.e. even functions, we note that increasing the order to an odd values usually leads to sharp increases in the number of iterations to convergence (Figure \ref{fig:iter_vs_M}).
-
 \subsection{Linear regression with a cosine basis}
+
+Using a cosine basis of the form $\phi_1(x) = cos(\pi x), \phi_2(x) = cos(2\pi x), ... , phi_M(x) = cos(M\pi x)$, we fit the same data as in Section 2.1 (Figure \ref{fig:cos_fitting}). Since the cosine basis contains the true basis used to generate the data, we observe low SSE for $M>=2$ and a good qualitative match to the true model for intermediate values of M. At larger values of M, we start overfitting to the noise in the generated data. For example, at M=8, $w_{opt} =  (0.769, 1.087, 0.099, 0.143, -0.051, 0.362, 0.012, 0.015) $. While $w_1=0.77$ and $w_2=1.09$ are close to the true model $w_1 = w_2 = 1$, higher order terms have nonzero weight. In the next section, we discuss how regularization techniques may be used to enforce prior beliefs on our model parameters to avoid overfitting to noise.
 
 \begin{figure}
 \caption{As the cosine order M increases, the sum of square error (SSE) between the fitted model and the input data decreases, however the risk of overfitting increases.}
@@ -127,9 +196,6 @@ Next we explore the performance of BGD and SGD on the same fitting problem with 
 \end{center}
 \label{fig:cos_fitting}
 \end{figure}
-
-Using a cosine basis of the form $\phi_1(x) = cos(\pi x), \phi_2(x) = cos(2\pi x), ... , phi_M(x) = cos(M\pi x)$, we fit the same data as in Section 2.1 (Figure \ref{fig:cos_fitting}). Since the cosine basis contains the true basis used to generate the data, we observe low SSE for $M>=2$ and a good qualitative match to the true model for intermediate values of M. At larger values of M, we start overfitting to the noise in the generated data. For example, at M=8, $w_{opt} =  (0.769, 1.087, 0.099, 0.143, -0.051, 0.362, 0.012, 0.015) $. While $w_1=0.77$ and $w_2=1.09$ are close to the true model $w_1 = w_2 = 1$, higher order terms have nonzero weight. In the next section, we discuss how regularization techniques may be used to enforce prior beliefs on our model parameters to avoid overfitting to noise.
-
 
 %\begin{table}
 %\caption{Fitted weight vectors for linear regression of Equation [ref] with cosine basis functions of increasing order.}
@@ -157,38 +223,41 @@ $$f(w,x) = \Phi w + \lambda w^Tw$$
 
 In a Baeysian framework, ridge regression represents including a prior that our weight parameters come from a gaussian distribution. In a frequentist framework, ridge regression is interpreted as adding a bias to our weight parameters in order to reduce the variance in our optimized weights. An advantage of regularization is that it allows model complexity to be tuned by adjusting the value of $\lambda$. In this section, we see how adding regularization affects our regressed parameters and how it allows us to fit a complex model to our data without severe overfitting.
 
-\begin{figure}
-\caption{As the polynomial order M increases, the number of iterations to convergence increases.}
-\begin{center}
-\includegraphics[width=200px]{P3_all_weights}
-\end{center}
-\label{fig:P3_all_weights}
-\end{figure}
-
-\begin{figure}
-\caption{As the polynomial order M increases, the number of iterations to convergence increases.}
-\begin{center}
-\includegraphics[width=200px]{P3_AIC}
-\end{center}
-\label{fig:P3_AIC}
-\end{figure}
-
-\begin{figure}
-\caption{As the polynomial order M increases, the number of iterations to convergence increases.}
-\begin{center}
-\includegraphics[width=200px]{P3_test}
-\end{center}
-\label{fig:P3_test}
-\end{figure}
-
 
 We performed ridge regression with a polynomial basis on the same data set as in Section 2.1. We see that at M=8, using ridge regression dramatically reduces the magnitude of the fitted parameters and avoids overfitting. At sufficiently high values of lambda, we see our error function increase and the quality of fit decrease as our fitted function approaches a flat line.
 
 % Figure: data fitted at M = 8 with different values of lambda
 % Figure: total error, bias, variance vs lambda for different values of M
 
-Next, we explore the optimization of our model parameters, $M$ and $\lambda$, by a data set split into a training (A), validation, and test (B) set. We measured the performance of each training on A and testing on B and vice versa, with validation performed on the validation set.
+Next, we explore the optimization of our model parameters, $M$ and $\lambda$, on a data set split into set A, B, and a validation set (shown in Figure \ref{fig:P3_test}). We measured the performance of each training on A and testing on B and vice versa, with validation performed on the validation set.
 
+\begin{figure}
+\caption{Fitted weights using different values of $\lambda$}
+\begin{center}
+\includegraphics[width=200px]{P3_all_weights}
+\end{center}
+\label{fig:P3_all_weights}
+\end{figure}
+
+To help choose a model, we computed the Akaike information criterion (AIC) to assess the tradeoff between goodness of fit and model complexity (Figure \ref{fig:P3_AIC}). 
+
+\begin{figure}
+\caption{AIC is used to help select a model.}
+\begin{center}
+\includegraphics[width=200px]{P3_AIC}
+\end{center}
+\label{fig:P3_AIC}
+\end{figure}
+
+After training on dataset A (and ignoring dataset B), we selected $M=2$ and $\lambda=0$, the model that yielded the lowest AIC as computed with the validation dataset. After training on dataset B (and ignoring dataset A), we selected $M=1$ and $\lambda=5$. We then evaluated their performance on their test set (Figure \ref{fig:P3_test}). The model trained on A yields a SSE of 25.753 predicting the values from set B. The model trained on set B yields an SSE of 17.720 predicting the values of set A. Here, we observed a large variation between our fitted models due to an outlier in dataset B, which has an outsized effect from the small size of our data sets. An alternative procedure that may be better suited for a data poor regime is k-fold cross validation.
+
+\begin{figure}
+\caption{Testing our chosen model. The model trained on data A is specified by $M=2, \lambda=0$. The model trained on dataset B is specified by $M=1,\lambda=5$.}
+\begin{center}
+\includegraphics[width=200px]{P3_test}
+\end{center}
+\label{fig:P3_test}
+\end{figure}
 
 % training table for different values of M and lambda on training set: AIC, BIC, error
 % validation table for different values of M and lambda on training set: AIC, BIC, error
@@ -207,10 +276,10 @@ Next, we explore the optimization of our model parameters, $M$ and $\lambda$, by
 While the regularization in ridge regression penalizes high value parameters, LASSO regularization promotes sparsity by driving coefficients of certain basis functions to zero.
 
 We trained, validated, and tested a dataset generated according to $y=w_{true}^T\phi(x) + \epsilon$, where $x,y \in \R, w \in \R^{13}$ and $\epsilon$ is a small noise. The feature vector is given by
-$$ \phi(x) = (x, sin(0.4\pi x), sin(2*0.4\pi x), sin(3*0.4\pi x),...,sin(12*0.4\pi x)) \in \R^13$$
+$$ \phi(x) = (x, sin(0.4\pi x), sin(2*0.4\pi x),...,sin(12*0.4\pi x)) \in \R^{13}$$
 
 \begin{figure}
-\caption{Training LASSO and ridge regularization.}
+\caption{Training LASSO and ridge regularization. Top panels show fitted models using different values of $\lambda$. Bottom panels show errors in the loss function and the AIC evaluated on the validation set.}
 \begin{center}
 \includegraphics[width=350px]{all_training}
 \end{center}
@@ -227,12 +296,12 @@ Our training results for various values of $\lambda$ for LASSO and ridge regular
 \label{fig:final_lasso_test}
 \end{figure}
 
-The optimized weights for each model is given in Figure \ref{fig:final_lasso_test} and a visualization of the fitted functions. While all models achieve a low error to the given data and qualitative agreement to the true model, visualizing the weights in the function shows that LASSO has most closely reproduced the true model. We also note that unregularized fitting yields parameters similar to ridge regression. This is likely a consequence of a small training set. We recommend combining the training and validation data sets used here and performing 3-fold cross validation for future work.
+The optimized weights for each model is given in Figure \ref{fig:final_lasso_test}. While all models achieve a low error to the given data and qualitative agreement to the true model, visualizing the weights in the function shows that LASSO has most closely reproduced the true model. We also note that unregularized fitting yields parameters similar to ridge regression. This is likely a consequence of a small training set which only consists of 5 data points. We recommend combining the training and validation data sets used here and performing 3-fold cross validation for future work.
 
  %Finding the optimal LASSO weights has no closed form solution.
 
 \section{Conclusions}
 
-We have introduced batch gradient descent and stochastic gradient descent, two numerical methods used in the optimization of loss functions. We then introduced how gradient descent can be used in the context of generalized least squares and compared its performance for regression on linear models where there exists a closed form solution. We explore the relationship between the complexity of the model and the degree of overfitting in this data-poor context, thus motivating the introduction of regularization. We show how changing the regularization penalty tunes the model complexity, in particular, how ridge biases towards small parameter values and how ridge biases towards sparse values.
+We have introduced batch gradient descent and stochastic gradient descent, two numerical methods used in the optimization of loss functions. We then introduced how gradient descent can be used in the context of generalized least squares and compared its performance for regression on linear models where there exists a closed form solution. We explore the relationship between the complexity of the model and the degree of overfitting in this data-poor context, thus motivating the introduction of regularization. We show how changing the regularization penalty tunes the model complexity, in particular, how ridge biases towards small parameter values and how LASSO biases towards sparse values.
 
  \end{document}
