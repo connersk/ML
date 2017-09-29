@@ -56,41 +56,39 @@ In this paper we explore methods for regression of simple linear models. In sect
 
 \subsection{Batch Gradient Descent on Gaussian and Quadratic Objective Functions}
 
-We implemented a basic batch gradient descent procedure for minimizing functions and tested this procedure on a Gaussian and  a quadratic function (Figure \ref{fig:1.1}). These functions have known minima at (10,10) and ($26.67,26.67$) respectively. This procedure takes in a constant step size, a starting guess vector, and a criteria for convergence. We examined the effects of these parameters.
+We implemented a basic batch gradient descent procedure for minimizing functions and tested this procedure on a Gaussian and a quadratic function (Figure \ref{fig:1.1_gauss}, \ref{fig:1.1_quad}). These functions have known minima at (10,10) and ($26.67,26.67$) respectively. This procedure takes in a constant step size, a starting guess vector, and a criteria for convergence. We examined the effects of these parameters.
  
  \medskip
 
- \textbf{Step Size}: For both functions, decreasing the step size caused the gradient descent procedure to converge slower (Fig \ref{fig:1.1}a,e). This makes sense as a smaller step size will cause a smaller update in each iteration. 
+ \textbf{Step Size}: For both functions, decreasing the step size caused the gradient descent procedure to converge slower (Fig \ref{fig:1.1_gauss}a, \ref{fig:1.1_quad}a). This makes sense as a smaller step size will cause a smaller update in each iteration. 
  
-  \textbf{Starting Guess}: The effect of the starting guess varied between the Gaussian and Quadratic functions (Fig \ref{fig:1.1}b,f). For the Gaussian function, whose minimum is at (10,10), the number of iterations to convergence increases as the Euclidean distance between the starting guess and true minimum increases. Furthermore since starting guesses (5,15) and (15,5) are the same distance from the minimum, they converge at exactly the same rate. On the other hand, the time to convergence of the quadratic function generally increases with the distance from the starting guess to the minimum, although not in all cases. Since the covariance of the two inputs is non-zero, the function produces different results for (16.67, 36.67) and (16.67, 16.67) which have the same Euclidean distance from the minimum at (26.67,26.67). When starting at (16.67,16.67) the function starts off higher but converges faster than when starting at (16.67,36.67). The convergence is slower at the second point because the covariation term will make it hard to increase the first variable while decreasing the second variable. 
+  \textbf{Starting Guess}: The effect of the starting guess varied between the Gaussian and Quadratic functions (Fig \ref{fig:1.1_gauss}b, \ref{fig:1.1_quad}b). For the Gaussian function, whose minimum is at (10,10), the number of iterations to convergence increases as the Euclidean distance between the starting guess and true minimum increases. Furthermore since starting guesses (5,15) and (15,5) are the same distance from the minimum, they converge at exactly the same rate. On the other hand, the time to convergence of the quadratic function generally increases with the distance from the starting guess to the minimum, although not in all cases. Since the covariance of the two inputs is non-zero, the function produces different results for (16.67, 36.67) and (16.67, 16.67) which have the same Euclidean distance from the minimum at (26.67,26.67). When starting at (16.67,16.67) the function starts off higher but converges faster than when starting at (16.67,36.67). The convergence is slower at the second point because the covariation term will make it hard to increase the first variable while decreasing the second variable. 
   
-\textbf{Convergence criteria}: For both functions there is an inverse relationship between the number of iterations to convergence and the $\log_{10}$ of the convergence criteria (Fig \ref{fig:1.1}c,g). This makes sense as decreasing the convergence criteria by a factor of 10 will mean that the gradient descent procedure must get closer to the true minimum before terminating
+\textbf{Convergence criteria}: For both functions there is an inverse relationship between the number of iterations to convergence and the $\log_{10}$ of the convergence criteria (Fig \ref{fig:1.1_gauss}c, \ref{fig:1.1_quad}c). This makes sense as decreasing the convergence criteria by a factor of 10 will mean that the gradient descent procedure must get closer to the true minimum before terminating
 
 \medskip
-Furthermore, for both functions we examined the norm of the gradient (Fig \ref{fig:1.1}d,h). In both cases, the norm of the gradient monotonically decreases and goes close to 0 at the time of convergence.
+Furthermore, for both functions we examined the norm of the gradient (Fig \ref{fig:1.1_gauss}d, \ref{fig:1.1_quad}d). In both cases, the norm of the gradient monotonically decreases and goes close to 0 at the time of convergence.
 
-\begin{figure}[!h]
-
-\subfloat[]{\includegraphics[width = 2in]{guassian_step_size.png}}
-\subfloat[]{\includegraphics[width = 2in]{gaussian_starting.png}}
-\subfloat[]{\includegraphics[width = 2in]{gaussian_convergence_criteria.png}}
-\subfloat[]{\includegraphics[width = 2in]{gaussian_gradient_norm.png}}
-\\
-
-\subfloat[]{\includegraphics[width = 2in]{quadratic_step_size.png}}
-\subfloat[]{\includegraphics[width = 2in]{quadratic_starting.png}}
-\subfloat[]{\includegraphics[width = 2in]{quadratic_convergence_criteria.png}}
-\subfloat[]{\includegraphics[width = 2in]{quadratic_gradient_norm.png}}
-\caption{Batch gradient descent convergence characteristics on a gaussian and quadratic function. }
-\label{fig:1.1}
+\begin{figure}
+\caption{Batch gradient descent convergence characteristics on a two-dimensional gaussian function.}
+\begin{center}
+\includegraphics[width=270px]{all_gaussian_gd}
+\end{center}
+\label{fig:1.1_gauss}
 \end{figure}
 
-\begin{figure}[!h]
-\centering
-\subfloat[]{\includegraphics[width = 2in]{gaussian_finite_difference.png}}
-\subfloat[]{\includegraphics[width = 2in]{quadratic_finite_difference.png}}
+\begin{figure}
+\caption{Batch gradient descent convergence characteristics on a quadratic bowl.}
+\begin{center}
+\includegraphics[width=270px]{all_quadratic_gd}
+\end{center}
+\label{fig:1.1_quad}
+\end{figure}
 
-\caption{The norm of the difference between the exact gradient and the central difference approximate gradient evaluated as the gradient descent procedure minimizes an objective function. Varied over different step sizes for the approximation. (A) Gaussian function with parameters from Fig 1d and (B) Quadratic function with parameters from Fig 1h}
+\begin{figure}
+\centering
+\includegraphics[width=270px]{all_finite_difference}
+\caption{The norm of the difference between the exact gradient and the central difference approximate gradient evaluated as the gradient descent procedure minimizes an objective function. Varied over different step sizes for the approximation. (A) Gaussian function with parameters from Figure 1d and (B) Quadratic function with parameters from Figure 2d}
 \label{fig:1.2}
 \end{figure}
 
