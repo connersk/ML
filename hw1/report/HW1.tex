@@ -50,13 +50,13 @@
 \author{[redacted]}
 \maketitle
  
-In this paper we explore methods for regression of simple linear models. In section 1, we begin by discussing a popular method for the numerical optimization of differentiable cost functions: gradient descent. We compare two variants of its implementation, batch gradient descent (BGD) and stochastic gradient descent (SGD), and discuss their convergence characteristics. In section 2, we benchmark the performance of gradient descent on the least squares fitting of simple linear models on generated data and compare its performance against the analytic solution. Since the generated data is known The simplicity of the data allows us to study the effect of model selection as we consider both polynomial basis functions and cosine basis functions for the fitted model. Finally, in sections 3 and 4, we explore the effect of L2- and L1-norm regularization, respectively, in model optimization and discuss their implications on the bias-variance tradeoff of the fitted parameters.
+In this paper we explore methods for regression of simple linear models. In section 1, we begin by discussing a popular method for the numerical optimization of differentiable cost functions: gradient descent. We compare two variants of its implementation, batch gradient descent (BGD) and stochastic gradient descent (SGD), and discuss their convergence characteristics. In section 2, we benchmark the performance of gradient descent on the least squares fitting of simple linear models on generated data and compare its performance against the analytic solution. Since the generated data is known The simplicity of the data allows us to study the effect of model selection as we consider both polynomial basis functions and cosine basis functions for the fitted model. Finally, in sections 3 and 4, we explore the effect of ridge and LASSO regularization, respectively, in model optimization and discuss their implications on the bias-variance tradeoff of the fitted parameters.
 
 \section{Gradient Descent}
 
 \subsection{Batch Gradient Descent on Gaussian and Quadratic Objective Functions}
 
- We implemented a basic batch gradient descent procedure for minimizing functions and tested this procedure on a Gaussian and  a quadratic function (Figure \ref{fig:1.1}). These functions have known minima at (10,10) and ($26.67,26.67$) respectively. This procedure takes in a constant step size, a starting guess vector, and a criteria for convergence. We examined the effects of these parameters.
+We implemented a basic batch gradient descent procedure for minimizing functions and tested this procedure on a Gaussian and  a quadratic function (Figure \ref{fig:1.1}). These functions have known minima at (10,10) and ($26.67,26.67$) respectively. This procedure takes in a constant step size, a starting guess vector, and a criteria for convergence. We examined the effects of these parameters.
  
  \medskip
 
@@ -178,7 +178,7 @@ Next we explore the performance of BGD and SGD on the same fitting problem with 
 This is a consequence of both having a model that is too complex for the given data and the stopping criterion in gradient descent methods; since there are a large number of higher order polynomials that can approximate our 11 data points, the SSE between any two of these functions will be small. Accordingly, we observed that changing the starting values of affects the gradient descent solutions for $w$. Additionally, if the convergence threshold is set to an extremely low value, the number of iterations goes up drastically since the difference in the objective between near-optimal solutions is very low. SGD is less susceptible to this problem since the algorithm is inherently noiser. Finally, since our underlying data was generated from a cosine basis, i.e. even functions, we note that increasing the order to an odd values usually leads to sharp increases in the number of iterations to convergence (Figure \ref{fig:iter_vs_M}).
 
 \begin{figure}
-\caption{As the polynomial order M increases, the number of iterations to convergence increases.}
+\caption{As the polynomial order M increases, the number of iterations to convergence increases. The tolerance for both BGD and SGD was 1e-6. BGD used a step size of 0.01. SGD used a learning rate given by $k=0.75, \tau=100$.}
 \begin{center}
 \includegraphics[width=200px]{iter_vs_M}
 \end{center}
